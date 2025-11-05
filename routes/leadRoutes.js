@@ -98,6 +98,29 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+router.put("/empTrack/:id", async (req, res) => {
+  try {
+    const lead = await Lead.findById(req.params.id);
+    if (!lead) return res.status(404).json({ error: "Lead not found" });
+
+    if (req.user.role !== "admin" && String(lead.assignedTo) !== String(req.user._id)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Partial update: only fields present in req.body will change
+    const updatedLead = await Lead.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true } // returns updated doc & runs schema validators
+    );
+
+    res.json({ lead: updatedLead, error: false, message: "Lead updated successfully" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+
 // Delete Lead
 router.delete("/:id", async (req, res) => {
   try {

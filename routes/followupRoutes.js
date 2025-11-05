@@ -31,7 +31,7 @@ router.get('/:id',async(req,res)=>{
   tomorrow: [],
   dayAfterTomorrow: []
 };
-if(user.role !== "admin") followups = followups.filter(f =>  f.assignedTo._id == user._id);
+if(user.role !== "admin") followups = followups.filter(f =>  String(f.assignedTo._id) === String(user._id));
   followups.forEach(f => {
     const d = new Date(f.followUp);
     const diff = Math.floor((d.getTime() - today.getTime()) / (1000*60*60*24));

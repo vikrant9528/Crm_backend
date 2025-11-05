@@ -14,6 +14,11 @@ const leadSchema = new mongoose.Schema({
   budget: String,
   notes: String,
   followUp: {type: Date,required: true},
+  time: {type:String,required:true},
+  call_track:{type:Number,default:0},
+  all_call_track:{type:Number},
+  all_whatsapp_track:{type:Number},
+  whatsapp_track:{type:Number,default:0},
   createdAt: { type: Date, default: Date.now }
 });
 
