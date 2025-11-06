@@ -18,6 +18,6 @@ app.use("/users", userRoutes);
 app.use("/followups",auth, followupRoutes);
 // Protected routes (require JWT)
 app.use("/leads", auth, leadRoutes);
-
-mongoose.connect("mongodb://localhost:27017/crm");
-app.listen(3000, () => console.log("Server running"));
+const PORT = process.env.PORT || 5000;
+mongoose.connect(process.env.DATABASE_URL);
+app.listen(PORT, () => console.log("Server running"));
