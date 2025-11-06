@@ -18,7 +18,7 @@ app.use("/users", userRoutes);
 app.use("/followups",auth, followupRoutes);
 // Protected routes (require JWT)
 app.use("/leads", auth, leadRoutes);
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running${PORT}`));
 mongoose
   .connect(process.env.DATABASE_URL)
