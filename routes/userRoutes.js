@@ -23,9 +23,9 @@ router.get("/:id", async (req, res) => {
     if(!userDetail) return res.status(404).json({ error:true, message:"User not found" });
     const users = userDetail.role === 'admin' ? await User.find({},{_id:1, name:1, role:1}) : await User.find({ role: { $ne: "admin" } }, "_id name role");
     // // const users = await User.find({ role: { $ne: "admin" } }, "_id name role");
-    res.json(users);
+    res.status(200).json({users , error:false , message : 'users fetched successfully'})
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: true , message:err.message });
   }
 });
 

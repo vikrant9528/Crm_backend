@@ -22,5 +22,6 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running${PORT}`));
 mongoose
   .connect(process.env.DATABASE_URL)
+//    .connect('mongodb://localhost:27017/crm')
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection failed:", err));
