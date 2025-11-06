@@ -125,16 +125,16 @@ router.put("/empTrack/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const lead = await Lead.findById(req.params.id);
-    if (!lead) return res.status(404).json({ error: "Lead not found" });
+    if (!lead) return res.status(404).json({ error:true , message:'Lead not found' });
 
     if (req.user.role !== "admin" && String(lead.assignedTo) !== String(req.user._id)) {
-      return res.status(403).json({ error: "Forbidden" });
+      return res.status(403).json({ error:true , message:'forbidden' });
     }
 
     await lead.deleteOne();
-    res.json({ message: "Lead deleted" });
+    res.status(200).json({ error:false, message: "Lead deleted" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error:true,message: err.message });
   }
 });
 
