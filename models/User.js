@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
 //   designation: String,
   role: { type: String, enum: ["admin", "employee"], default: "employee" },
   password: { type: String, required: true } ,  // <-- missing before
-  empCode : {type:String, required:true}
+  empCode : {type:String, required:true} , 
+  profileImage : {type:String , required:true}
 });
 
 userSchema.pre("save", async function (next) {
