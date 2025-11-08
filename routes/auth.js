@@ -25,61 +25,52 @@ router.post("/signup", upload.single("file"), async (req, res) => {
   try {
     const { name, phone, email, role, password, empCode } = req.body;
     const exists = await User.findOne({ email });
-
     if (exists) return res.status(400).json({ error: true, message: "Email already exists" });
 
     let profileImage = null;
 
     if (req.file) {
-      console.log(req.file);
-      
-      const result = await cloudinary.uploader.upload_stream(
-        { folder: "userData" },
-        async (error, uploadResult) => {
-          if (error) return res.status(500).json({ error: true, message: error.message });
+      const uploadToCloudinary = () => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "userData" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+          stream.end(req.file.buffer);
+        });
+      };
 
-          profileImage = uploadResult.secure_url;
-
-          const user = new User({
-            name,
-            phone,
-            email,
-            role,
-            password,
-            empCode,
-            profileImage
-          });
-
-          await user.save();
-          const token = user.generateToken();
-
-          return res.status(201).json({
-            error: false,
-            user: { id: user._id, name: user.name, role: user.role, profileImage },
-            token,
-            message: "Signup successfully"
-          });
-        }
-      );
-
-      result.end(req.file.buffer);
-      return; // Stop execution here because Cloudinary uploads async
+      const uploadResult = await uploadToCloudinary();
+      profileImage = uploadResult.secure_url;
     }
 
-    // If no file upload
-    const user = new User({ name, phone, email, role, password, empCode });
+    const user = new User({
+      name,
+      phone,
+      email,
+      role,
+      password,
+      empCode,
+      profileImage
+    });
+
     await user.save();
     const token = user.generateToken();
-    res.status(201).json({
+
+    return res.status(201).json({
       error: false,
-      user: { id: user._id, name: user.name, role: user.role },
+      user: { id: user._id, name: user.name, role: user.role, profileImage },
       token,
       message: "Signup successfully"
     });
 
   } catch (err) {
-    res.status(400).json({ error: true, message: err.message });
+    return res.status(400).json({ error: true, message: err.message });
   }
 });
+
 
 module.exports = router;
