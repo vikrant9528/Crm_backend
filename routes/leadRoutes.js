@@ -31,16 +31,65 @@ router.post("/", async (req, res) => {
 });
 
 // Get leads (admin sees all, employee sees only assigned)
+// router.get("/", async (req, res) => {
+//   try {
+//     const filter = req.user.role === "admin" ? {} : { assignedTo: req.user._id };
+//     const leads = await Lead.find(filter).populate("assignedTo", "_id name role");
+//     const timeline = await Timeline.find({},{action:1,from:1,to:1,createdAt:1,name:1,_id:0});
+//     res.status(200).json({error:false,message:'success',leads,timeline});
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
 router.get("/", async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { assignedTo: req.user._id };
-    const leads = await Lead.find(filter).populate("assignedTo", "_id name role");
-    const timeline = await Timeline.find({},{action:1,from:1,to:1,createdAt:1,name:1,_id:0});
-    res.json({leads,timeline});
+    // Parse pagination parameters from query (default: page=1, limit=10)
+    
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Role-based filtering
+    const filter = req.user.role === "admin"
+      ? {}
+      : { assignedTo: req.user._id };
+
+    // Count total leads for pagination info
+    const totalLeads = await Lead.countDocuments(filter);
+
+    // Fetch paginated leads
+    const leads = await Lead.find(filter)
+      .populate("assignedTo", "_id name role")
+      .sort({ createdAt: -1 }) // optional: newest first
+      .skip(skip)
+      .limit(limit);
+
+    // Fetch timeline (unchanged)
+    const timeline = await Timeline.find(
+      {},
+      { action: 1, from: 1, to: 1, createdAt: 1, name: 1, _id: 0 }
+    );
+
+    // Send response
+    res.status(200).json({
+      error: false,
+      message: "success",
+      leads,
+      timeline,
+      pagination: {
+        totalLeads,
+        currentPage: page,
+        totalPages: Math.ceil(totalLeads / limit),
+        limit,
+      },
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: true, message: err.message });
   }
 });
+
 
 // Read one Lead
 router.get("/:id", async (req, res) => {

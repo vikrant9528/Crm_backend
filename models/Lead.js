@@ -20,6 +20,6 @@ const leadSchema = new mongoose.Schema({
   all_whatsapp_track:{type:Number},
   whatsapp_track:{type:Number,default:0},
   createdAt: { type: Date, default: Date.now }
-});
+},{timestamps:true});
 
 module.exports = mongoose.model("Lead", leadSchema);

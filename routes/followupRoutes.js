@@ -23,8 +23,9 @@ router.get('/:id',async(req,res)=>{
     let followups = await Lead.find({   
       followUp: {
         $gte: today,
-        $lte: endOfDayAfter
-      } 
+        $lte: endOfDayAfter,
+      },
+      status: { $ne: 'not_interested' } 
 }).populate("assignedTo",  "_id name role");
   const grouped = {
   today: [],
