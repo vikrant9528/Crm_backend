@@ -30,6 +30,42 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.post("/importLeads", async (req, res) => {
+  try {
+    if (!Array.isArray(req.body)) {
+      return res.status(400).json({ error: true, message: "Send array only" });
+    }
+
+    const data = req.body.map(item => {
+      if (!item.assignedTo || !mongoose.Types.ObjectId.isValid(item.assignedTo)) {
+        throw new Error("Invalid or missing assignedTo ID");
+      }
+
+      return {
+        name: item.name,
+        phone: item.phone,
+        email: item.email,
+        source: item.source,
+        budget: item.budget,
+        notes: item.notes,
+        assignedTo: item.assignedTo
+      };
+    });
+
+    const result = await Lead.insertMany(data);
+
+    return res.status(201).json({
+      error: false,
+      message: "Excel uploaded successfully",
+      data: result
+    });
+
+  } catch (err) {
+    return res.status(400).json({ error: true, message: err.message });
+  }
+});
+
+
 // Get leads (admin sees all, employee sees only assigned)
 // router.get("/", async (req, res) => {
 //   try {
@@ -85,8 +121,7 @@ router.get("/", async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: true, message: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
