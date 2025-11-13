@@ -9,6 +9,7 @@ const authRoutes = require("./routes/auth");
 const followupRoutes = require("./routes/followupRoutes");
 const auth = require("./middleware/auth");
 require("dotenv").config();
+require('./routes/resetTracks.js')
 
 const app = express();
 app.use(cors({origin:'*'}));
