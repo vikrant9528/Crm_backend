@@ -18,7 +18,7 @@ router.post("/login", async (req, res) => {
 
   const result = await User.findOne({email})
   const token = user.generateToken();
-  res.json({error:false , token , message:'login successfull' , details:{_id:result._id,role:result.role,profileImage:result.profileImage , name:result.name} });
+  res.json({error:false , token , message:'login successfull' , details:{_id:result._id,role:result.role,profileImage:result.profileImage , name:result.name , email:result.email} });
 });
 
 router.post("/signup", upload.single("file"), async (req, res) => {
